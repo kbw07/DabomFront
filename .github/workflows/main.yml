@@ -17,9 +17,11 @@ jobs:
           
       - name: Install dependencies
         run: npm install
-        
+        working-directory: ./frontEnd
+
       - name: Build Vue app
         run: npm run build
+        working-directory: ./frontEnd
         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -33,7 +35,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./frontEnd
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/vue_frontend:${{ github.run_number }}
 
