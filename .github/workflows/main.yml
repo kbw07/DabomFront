@@ -50,3 +50,59 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 224
           script: |
+            if kubectl get svc dabom-front -n dabom -o wide | grep -q "green"; then
+              CURRENT_VER="green"
+              NEXT_VER="blue"
+            else
+              CURRENT_VER="blue"
+              NEXT_VER="green"
+            fi
+
+            cat <<EOF | kubectl apply -f -
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: vue-deployment-${NEXT_VER}
+              namespace: dabom
+            spec:
+              selector:
+                matchLabels:
+                  type: app
+                  ver: ${NEXT_VER}
+              replicas: 1
+              strategy:
+                type: RollingUpdate
+              template:
+                metadata:
+                  labels:
+                    type: app
+                    ver: ${NEXT_VER}
+                spec:
+                  containers:
+                    - name: container
+                      image: ${{ secrets.DOCKERHUB_USERNAME }}/vue_frontend:${{ github.run_number }}
+                      ports:
+                        - containerPort: 80
+                      livenessProbe:
+                        httpGet:
+                          path: /
+                          port: 80
+                        initialDelaySeconds: 10
+                        periodSeconds: 10
+                      readinessProbe:
+                        httpGet:
+                          path: /
+                          port: 80
+                        initialDelaySeconds: 10
+                        periodSeconds: 5
+                        successThreshold: 2
+                  terminationGracePeriodSeconds: 0
+            EOF
+
+            kubectl rollout status deployment/vue-deployment-${NEXT_VER} -n dabom
+
+            kubectl patch service dabom-front -n dabom -p '{"spec":{"selector":{"ver":"'${NEXT_VER}'"}}}'
+
+            kubectl scale deployment vue-deployment-${CURRENT_VER} -n dabom --replicas=0
+            
+            
