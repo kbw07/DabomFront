@@ -101,6 +101,7 @@ jobs:
                   terminationGracePeriodSeconds: 0
             EOF
 
+            kubectl rollout status deployment/vue-deployment-${NEXT_VER} -n dabom
 
             kubectl patch service dabom-front -n dabom -p '{"spec":{"selector":{"ver":"'${NEXT_VER}'"}}}'
             kubectl scale deployment vue-deployment-${CURRENT_VER} -n dabom --replicas=0
