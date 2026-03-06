@@ -18,7 +18,7 @@
 
 <table align="center">
 <tr>
-<td align="center"><strong>🧑‍💻 강병욱.</strong></td>
+<td align="center"><strong>🧑‍💻 강병욱</strong></td>
 <td align="center"><strong>🧑‍💻 김륜환</strong></td>
 <td align="center"><strong>🧑‍💻 김성인</strong></td>
 <td align="center"><strong>🧑‍💻 양형모</strong></td>
